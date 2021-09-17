@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e912bb3e0b81b43f59d5aa11df6e05b7, type: 3}
+  m_Name: BoardState
+  m_EditorClassIdentifier: 
+  BoardSize: 15
+  Colors:
+  - {r: 0.9150943, g: 0.14244394, b: 0.14244394, a: 0}
+  - {r: 0.28746462, g: 1, b: 0, a: 0}
+  - {r: 0.7706003, g: 0, b: 1, a: 0}
+  - {r: 0, g: 0.05740881, b: 1, a: 0}
+  - {r: 1, g: 0.870023, b: 0, a: 0}
+  FieldChangedEvent: {fileID: 11400000, guid: 783e6af10ae3b473580314a5b751101f, type: 2}
