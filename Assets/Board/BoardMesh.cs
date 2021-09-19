@@ -39,11 +39,12 @@ public class BoardMesh : MonoBehaviour {
         mesh.triangles = tris;
         meshFilter.mesh = mesh;
 
-        fieldTexture = new Texture2D(boardSize, boardSize, TextureFormat.RGB24, false);
-        fieldTexture.filterMode = FilterMode.Point;
-        fieldTexture.wrapMode = TextureWrapMode.Clamp;
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
+        fieldTexture = new Texture2D(boardSize, boardSize, TextureFormat.RGBA32, false) {
+            filterMode = FilterMode.Point,
+            wrapMode = TextureWrapMode.Clamp
+        };
+        for (var i = 0; i < boardSize; i++) {
+            for (var j = 0; j < boardSize; j++) {
                 fieldTexture.SetPixel(i, j,
                     BoardState.IsFieldOccupiedWithColor(i, j, ColorIndex) ? Color.white : Color.black);
             }
@@ -69,5 +70,9 @@ public class BoardMesh : MonoBehaviour {
 
     public void SetDraggableCirclePosition(Vector2 position) {
         material.SetVector("_DraggingCirclePosition", new Vector4(position.x, 0, position.y, 0));
+    }
+
+    public void SetDraggableCircleTargetColor(Color color) {
+        material.SetColor("_AddingCircleColor", color);
     }
 }

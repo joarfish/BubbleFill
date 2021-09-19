@@ -18,7 +18,8 @@ public class GameState : ScriptableObject {
     }
 
     public void PlayerMakesMove() {
-        OnPlayerMovesChanged(PlayerMoves++);
+        OnPlayerMovesChanged(++PlayerMoves);
+        Debug.Log("Player moves: "+ PlayerMoves);
     }
 
     public void Reset() {

@@ -45,6 +45,7 @@ public class BoardManager : MonoBehaviour {
 
     public void OnSetDragCirclePosition(Vector2 position) {
         var boardMesh = _boardMeshes[_currentColorIndex];
+        boardMesh.SetDraggableCircleTargetColor(boardState.GetColorForPosition(position));
         position.x += boardState.BoardSize * 0.5f;
         position.y += boardState.BoardSize * 0.5f;
         boardMesh.SetDraggableCirclePosition(position);

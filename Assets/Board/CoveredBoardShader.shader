@@ -5,8 +5,9 @@ Shader "Unlit/CoveredBoardShader"
         _FieldTexture ("Field", 2D) = "white" {}
         _Smoothing ("Smoothing Factor", Float) = 0.75
         _Color ("Color", Color) = (1.0, 0, 0, 1.0)
-        _BoardSize ("Board Size", int) = 10
+        _BoardSize ("Board Size", int) = 15
         _AddingCircle ("Adding Circle", int) = 0
+        _AddingCircleColor ("Adding Circle Color", Color) = (0.1, 0.6, 0.6, 1.0)
         _DraggingCirclePosition ("Dragging Circle Position", Vector) = (0.0, 0.0, 0.0, 0.0)
     }
     SubShader
@@ -34,12 +35,13 @@ Shader "Unlit/CoveredBoardShader"
             struct v2f
             {
                 float4 vertex : SV_POSITION;
-                float4 worldPosition : NORMAL;
+                float4 worldPosition : POSITION1;
             };
 
             sampler2D _FieldTexture;
             float _Smoothing;
             float4 _Color;
+            float4 _AddingCircleColor;
             int _BoardSize;
             int _AddingCircle;
             float4 _DraggingCirclePosition;
@@ -67,53 +69,58 @@ Shader "Unlit/CoveredBoardShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = fixed4(1.0, 0.0, 0.0, 1.0);
-                
-                float2 fieldCoord = float2(
-                    floor(i.worldPosition.x + _BoardSize * 0.5),
-                    floor(i.worldPosition.z + _BoardSize * 0.5)
-                );
-                float2 normFieldCoord = fieldCoord / _BoardSize;
-                float increment = 1.0 / _BoardSize;
-                float2 p = i.worldPosition.xz + float2(_BoardSize * 0.5, _BoardSize * 0.5);
                 float radius = 0.49;
                 float2 correction = float2(radius, radius);
+                float2 fieldCoord = float2(
+                    trunc(i.worldPosition.x + _BoardSize * 0.5f),
+                    trunc(i.worldPosition.z + _BoardSize * 0.5f)
+                );
+
+                float increment = 1.0 / (float)_BoardSize;
+                #if SHADER_API_VULKAN
+                    // For reasons that are beyond me we have to correct the UV by one field:
+                    float2 uvCoord = fieldCoord / ((float)_BoardSize + 1.0f) + float2(increment, increment);
+                #else
+                    float2 uvCoord = fieldCoord / ((float)_BoardSize + 1.0f);
+                #endif
+                float2 p = i.worldPosition.xz + float2(_BoardSize * 0.5f, _BoardSize * 0.5f);
                 
                 float distances[10] = {
-                        sdfCircle(p, fieldCoord + float2(-1.0, -1.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(0.0, -1.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(1.0, -1.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(-1.0, 0.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(0.0, 0.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(1.0, 0.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(-1.0, 1.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(0.0, 1.0) + correction, radius),
-                        sdfCircle(p, fieldCoord + float2(1.0, 1.0) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(-1.0f, -1.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(0.0f, -1.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(1.0f, -1.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(-1.0f, 0.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(0.0f, 0.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(1.0f, 0.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(-1.0f, 1.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(0.0f, 1.0f) + correction, radius),
+                        sdfCircle(p, fieldCoord + float2(1.0f, 1.0f) + correction, radius),
                         sdfCircle(p, _DraggingCirclePosition.xz, radius)
                 };
                 float fields[10] = {
-                        tex2D(_FieldTexture, float2(normFieldCoord.x - increment, normFieldCoord.y - increment)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x, normFieldCoord.y - increment)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x + increment, normFieldCoord.y - increment)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x - increment, normFieldCoord.y)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x, normFieldCoord.y)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x + increment, normFieldCoord.y)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x - increment, normFieldCoord.y + increment)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x, normFieldCoord.y + increment)).r,
-                        tex2D(_FieldTexture, float2(normFieldCoord.x + increment, normFieldCoord.y + increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x - increment, uvCoord.y - increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x, uvCoord.y - increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x + increment, uvCoord.y - increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x - increment, uvCoord.y)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x, uvCoord.y)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x + increment, uvCoord.y)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x - increment, uvCoord.y + increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x, uvCoord.y + increment)).r,
+                        tex2D(_FieldTexture, float2(uvCoord.x + increment, uvCoord.y + increment)).r,
                         (float)_AddingCircle
                 };
                 float distance = 1000.0;
-                for (int i = 0; i < 10; i++) {
-                    if (fields[i] == 0) {
+                for (int j = 0; j < 10; j++) {
+                    if (fields[j] == 0) {
                         continue;
                     }
-                    distance = opSmoothUnion(distance, distances[i], _Smoothing);
+                    distance = opSmoothUnion(distance, distances[j], _Smoothing);
                 }
-                
                 if (distance > 0.01) {
                    discard;
                 }
+
+                //return lerp( _Color, _AddingCircleColor, _AddingCircle * (1.0f - smoothstep(0.0f, 1.0f, distances[9])));
                 return _Color;
             }
             ENDCG

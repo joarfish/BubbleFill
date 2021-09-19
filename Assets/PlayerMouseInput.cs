@@ -4,12 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-/*
- * Click -> Start Drag
- * Dragging -> Max d = 1
- * Release -> End Drag
- */
-
 internal interface IPlayerInputState {
     public IPlayerInputState HandleInput(PlayerMouseInput playerMouseInput, CoveredFields coveredFields);
 }
@@ -50,7 +44,6 @@ internal class IdleInputState : IPlayerInputState {
         if (!Input.GetMouseButton(0) || !coveredFields.IsWorldCoordinateInCoveredField(mousePosition)) {
             return this;
         }
-
         playerMouseInput.OnDragStart.Invoke();
         return new DraggingInputState(mousePosition);
     }

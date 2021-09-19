@@ -41,6 +41,25 @@ public class BoardState : ScriptableObject {
                 };
             }
         }
+
+        var msg = "";
+        for (var i = BoardSize - 1; i >= 0; i--) {
+            for (var j = 0; j < BoardSize; j++) {
+                var color = _fieldStates[j, i].ColorIndex switch {
+                    0 => "red",
+                    1 => "green",
+                    2 => "lila",
+                    3 => "blue",
+                    4 => "yellow",
+                    _ => "black"
+                };
+                msg += " <color="+color+">" + _fieldStates[j, i].ColorIndex + "</color> ";
+            }
+
+            msg += "\n";
+        }
+
+        Debug.Log(msg);
     }
 
     private void OnDisable() {
@@ -82,5 +101,11 @@ public class BoardState : ScriptableObject {
 
     public Color GetColorForIndex(int colorIndex) {
         return Colors[colorIndex];
+    }
+
+    public Color GetColorForPosition(Vector2 position) {
+        var column = (int)Math.Floor(position.x + 0.5f * BoardSize);
+        var row = (int)Math.Floor(position.y + 0.5f * BoardSize);
+        return Colors[_fieldStates[column, row].ColorIndex];
     }
 }
