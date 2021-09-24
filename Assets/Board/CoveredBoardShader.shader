@@ -61,7 +61,7 @@ Shader "Unlit/CoveredBoardShader"
                 return length(center - p) - radius;
             }
             
-            float opSmoothUnion( float d1, float d2, float k )
+            float opSmoothUnion(float d1, float d2, float k)
             {
                 float h = max(k-abs(d1-d2),0.0);
                 return min(d1, d2) - h*h*0.25/k;
@@ -76,13 +76,13 @@ Shader "Unlit/CoveredBoardShader"
                     trunc(i.worldPosition.z + _BoardSize * 0.5f)
                 );
 
-                float increment = 1.0 / (float)_BoardSize;
-                #if SHADER_API_VULKAN
+                float increment = 1.0 / ((float)_BoardSize + 1.0f);
+                //#if defined(SHADER_API_VULKAN)
                     // For reasons that are beyond me we have to correct the UV by one field:
                     float2 uvCoord = fieldCoord / ((float)_BoardSize + 1.0f) + float2(increment, increment);
-                #else
-                    float2 uvCoord = fieldCoord / ((float)_BoardSize + 1.0f);
-                #endif
+                //#else
+                //    float2 uvCoord = fieldCoord / ((float)_BoardSize + 1.0f);
+                //#endif
                 float2 p = i.worldPosition.xz + float2(_BoardSize * 0.5f, _BoardSize * 0.5f);
                 
                 float distances[10] = {

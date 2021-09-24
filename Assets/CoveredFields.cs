@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Rendering.VirtualTexturing;
 
 public class CoveredFields : MonoBehaviour {
     public BoardState boardState;
@@ -49,6 +48,9 @@ public class CoveredFields : MonoBehaviour {
         }
 
         // Todo: Add check if allowed
+        
+        
+        
         _coveredFields[column, row] = true;
         _coveredFieldsCount++;
         SwitchCoveredColor(boardState.GetFieldColorIndex(column, row));

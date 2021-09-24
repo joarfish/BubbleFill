@@ -104,8 +104,12 @@ public class BoardState : ScriptableObject {
     }
 
     public Color GetColorForPosition(Vector2 position) {
+        return Colors[GetColorIndexForPosition(position)];
+    }
+
+    public int GetColorIndexForPosition(Vector2 position) {
         var column = (int)Math.Floor(position.x + 0.5f * BoardSize);
         var row = (int)Math.Floor(position.y + 0.5f * BoardSize);
-        return Colors[_fieldStates[column, row].ColorIndex];
+        return _fieldStates[column, row].ColorIndex;
     }
 }

@@ -65,6 +65,12 @@ public class BoardMesh : MonoBehaviour {
     }
 
     public void SetDraggableCircle(bool draggable) {
+        var position = transform.position;
+        transform.position = new Vector3(
+            position.x,
+            draggable ? 1.0f : 0.0f,
+            position.z
+        );
         material.SetInt("_AddingCircle", draggable ? 1 : 0);
     }
 
